@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class RandomGeneratorServiceImpl implements RandomGeneratorService {
 
@@ -20,15 +19,26 @@ public class RandomGeneratorServiceImpl implements RandomGeneratorService {
     private final GenerateRangeValueValidator generateRangeValueValidator;
     private final ResultGenerator resultGenerator;
     private final ResultPrinter resultPrinter;
+    private final int min;
+    private final int max;
+    private final String stringedOperator;
 
-    @Value("${random-number-generator.range.min}")
-    private int min;
-
-    @Value("${random-number-generator.range.max}")
-    private int max;
-
-    @Value("${random-number-generator.operator}")
-    private String stringedOperator;
+    public RandomGeneratorServiceImpl(InternalNumberProviderService internalNumberProviderService,
+                                      ExternalNumberProviderService externalNumberProviderService,
+                                      GenerateRangeValueValidator generateRangeValueValidator,
+                                      ResultGenerator resultGenerator, ResultPrinter resultPrinter,
+                                      @Value("${random-number-generator.range.min}") int min,
+                                      @Value("${random-number-generator.range.max}") int max,
+                                      @Value("${random-number-generator.operator}") String stringedOperator) {
+        this.internalNumberProviderService = internalNumberProviderService;
+        this.externalNumberProviderService = externalNumberProviderService;
+        this.generateRangeValueValidator = generateRangeValueValidator;
+        this.resultGenerator = resultGenerator;
+        this.resultPrinter = resultPrinter;
+        this.min = min;
+        this.max = max;
+        this.stringedOperator = stringedOperator;
+    }
 
     @Override
     public void generateRandomNumber() {
