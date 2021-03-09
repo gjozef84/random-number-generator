@@ -1,7 +1,6 @@
-package com.gjozef84.randomnumbergenerator.service.impl;
+package com.gjozef84.randomnumbergenerator.service;
 
 import com.gjozef84.randomnumbergenerator.exceptions.GenerateNumberByExternalProviderException;
-import com.gjozef84.randomnumbergenerator.service.RandomNumberProviderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,17 +19,17 @@ import static com.gjozef84.randomnumbergenerator.common.Constants.TIMEOUT_DURATI
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class ExternalNumberProviderService implements RandomNumberProviderService {
+class ExternalNumberProviderServiceImpl implements RandomNumberProviderService {
 
     private static final String BASE_URL = "https://www.random.org/integers/?num=1&col=1&base=10&format=plain&rnd=new";
 
     @Override
     public Integer generateRandomValue(int min, int max) {
         URI requestUri = createRequestUri(min, max);
-        log.debug("requestURI {}", requestUri);
+        log.info("requestURI {}", requestUri);
 
         String generatedRandomValue = getValueFromApi(requestUri);
-        log.debug("generatedRandomValue by external provider {}", generatedRandomValue);
+        log.info("ExternalNumberProviderService generated value = {}", generatedRandomValue);
 
         return Optional.ofNullable(generatedRandomValue)
             .map(Integer::valueOf)
@@ -55,14 +54,17 @@ public class ExternalNumberProviderService implements RandomNumberProviderServic
         HttpResponse<String> response = null;
         try {
             response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             log.error(e.getMessage(), e);
+        } catch (InterruptedException e) {
+            log.error(e.getMessage(), e);
+            Thread.currentThread().interrupt();
         }
 
         if (response != null && (HttpURLConnection.HTTP_OK == response.statusCode())) {
             return response.body().replace("\n", "");  //Random.org API returns JSON with '\n'
         } else {
-            log.error("API return error. HTTP status code {}. Error details: {}", response.statusCode(), response.body());
+            log.error("API return error. Response {}", response);
             return null;
         }
     }

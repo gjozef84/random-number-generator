@@ -9,8 +9,6 @@ spring:
     name: Random Number Generator Backend Application
 
 random-number-generator:
-  scheduled:
-    generate-every-milliseconds: 10000
   range:
     min: 1  # Minimum value must be an integer in the [-1000000000,1000000000] interval
     max: 1000000000 # Maximum value must be an integer in the [-1000000000,1000000000] interval
