@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class InternalNumberProviderServiceImplTest {
 
-    private final RandomNumberProviderService underTest = new InternalNumberProviderServiceImpl();
+    private final InternalNumberProviderServiceImpl underTest = new InternalNumberProviderServiceImpl();
 
     @Test
     void testGenerateRandomValue() {

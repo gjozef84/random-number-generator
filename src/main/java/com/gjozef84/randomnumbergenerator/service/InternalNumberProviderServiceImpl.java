@@ -10,12 +10,8 @@ class InternalNumberProviderServiceImpl implements RandomNumberProviderService {
 
     @Override
     public Integer generateRandomValue(int min, int max) {
-        RandomDataGenerator randomDataGenerator = new RandomDataGenerator();
-        randomDataGenerator.reSeedSecure();
-
-        Integer generationResult = randomDataGenerator.nextSecureInt(min, max);
+        Integer generationResult = new RandomDataGenerator().nextSecureInt(min, max);
         log.info("InternalNumberProviderService generated value = {}", generationResult);
-
         return generationResult;
     }
 }

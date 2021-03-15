@@ -1,12 +1,17 @@
 package com.gjozef84.randomnumbergenerator.service;
 
 import com.gjozef84.randomnumbergenerator.common.OperatorType;
+import com.gjozef84.randomnumbergenerator.common.ProviderName;
+import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Arrays;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -22,6 +27,8 @@ class RandomNumberGeneratorFacadeTest {
 
     @Mock
     private ExternalNumberProviderServiceImpl externalNumberProviderServiceImpl;
+
+    private Map<ProviderName, RandomNumberProviderService> numberProviders;
 
     @Mock
     private ResultGenerator resultGenerator;
@@ -44,8 +51,9 @@ class RandomNumberGeneratorFacadeTest {
         min = 1;
         max = 10;
         stringedOperator = "+";
-        underTest = new RandomNumberGeneratorFacade(internalNumberProviderServiceImpl, externalNumberProviderServiceImpl,
-            resultGenerator, min, max, stringedOperator);
+        numberProviders = ImmutableMap.<ProviderName, RandomNumberProviderService>builder().put(ProviderName.INTERNAL, internalNumberProviderServiceImpl)
+            .put(ProviderName.EXTERNAL, externalNumberProviderServiceImpl).build();
+        underTest = new RandomNumberGeneratorFacade(internalNumberProviderServiceImpl, externalNumberProviderServiceImpl, resultGenerator, min, max, stringedOperator);
     }
 
     @ParameterizedTest
@@ -53,9 +61,9 @@ class RandomNumberGeneratorFacadeTest {
     void testGenerateRandomNumber(Integer numberByInternatProvider, Integer numberByExternalProvider, Integer expected) {
         when(internalNumberProviderServiceImpl.generateRandomValue(min, max)).thenReturn(numberByInternatProvider);
         when(externalNumberProviderServiceImpl.generateRandomValue(min, max)).thenReturn(numberByExternalProvider);
-        when(resultGenerator.calculateGeneratedResult(numberByInternatProvider, numberByExternalProvider, OperatorType.ADDITION)).thenReturn(expected);
+        when(resultGenerator.calculateGeneratedResult(Arrays.asList(numberByInternatProvider, numberByExternalProvider), OperatorType.ADDITION)).thenReturn(expected);
 
-        Integer actual = underTest.generateRandomNumber();
+        Object actual = underTest.generateRandomNumber(Arrays.asList(ProviderName.INTERNAL, ProviderName.EXTERNAL));
 
         assertEquals(expected, actual);
         verify(internalNumberProviderServiceImpl).generateRandomValue(anyInt(), anyInt());

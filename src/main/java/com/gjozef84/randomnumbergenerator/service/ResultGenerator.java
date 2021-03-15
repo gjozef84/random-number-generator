@@ -1,22 +1,25 @@
 package com.gjozef84.randomnumbergenerator.service;
 
 import com.gjozef84.randomnumbergenerator.common.OperatorType;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
-@Slf4j
 class ResultGenerator {
 
-    public Integer calculateGeneratedResult(Integer numberGeneratedByInternalProvider, Integer numberGeneratedByExternalProvider, OperatorType operatorType) {
-        if (ObjectUtils.allNotNull(numberGeneratedByInternalProvider, numberGeneratedByExternalProvider)) {
-            return operatorType.apply(numberGeneratedByInternalProvider, numberGeneratedByExternalProvider);
-        } else {
-            log.info("numberGeneratedByExternalProvider returns null value. calculateGeneratedResult return only numberGeneratedByInternalProvider value {}",
-                numberGeneratedByInternalProvider);
-            return numberGeneratedByInternalProvider;
+    public Object calculateGeneratedResult(List<Object> generatedValues, OperatorType operatorType) {
+        Object result = generatedValues.get(0);
+
+        for (int i = 1; i < generatedValues.size(); i++) {
+            Object generatedValue = generatedValues.get(i);
+            if (generatedValue instanceof Number) {
+                result = operatorType.apply((int) result, (int) generatedValue);
+            } else {  // should be added here a parse methods if added a provider generating data different than numbers
+                throw new UnsupportedOperationException();
+            }
         }
+        return result;
     }
 }
     
